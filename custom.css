@@ -1,0 +1,742 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&display=swap');
+/* =========================================================
+   NEMO GUEST HOUSE
+   CUSTOM UI LAYER
+   ========================================================= */
+
+:root {
+    --nemo-cream: #e8ddc8;
+    --nemo-ivory: #f7f1e7;
+    --nemo-teal: #163f42;
+    --nemo-rust: #9a503e;
+    --nemo-gold: #b79d68;
+
+    --nemo-ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   HIDE ORIGINAL FRAMER NAVIGATION
+   ========================================================= */
+
+[data-framer-name="Courtyard Opening"]
+nav[data-framer-name="Navigation"] {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* =========================================================
+   OUR HEADER
+   ========================================================= */
+
+#nemo-header {
+    position: fixed;
+    z-index: 999999;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 82px;
+
+    display: flex;
+    align-items: center;
+
+    pointer-events: none;
+
+    color: var(--nemo-ivory);
+
+    transition:
+        height .45s var(--nemo-ease),
+        color .45s ease,
+        background-color .45s ease,
+        box-shadow .45s ease,
+        backdrop-filter .45s ease;
+}
+
+/* inner width */
+
+#nemo-header .nemo-header-inner {
+    width: calc(100% - 120px);
+    max-width: none;
+    height: 100%;
+
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    pointer-events: auto;
+}
+
+/* =========================================================
+   HEADER AFTER SCROLL
+   ========================================================= */
+
+body.nemo-scrolled #nemo-header {
+    height: 68px;
+
+    color: var(--nemo-teal);
+
+    background: rgba(247, 241, 231, .88);
+
+    border-bottom: 1px solid rgba(22, 63, 66, .08);
+
+    box-shadow:
+        0 8px 30px rgba(22, 63, 66, .07);
+
+    backdrop-filter: blur(16px) saturate(115%);
+    -webkit-backdrop-filter: blur(16px) saturate(115%);
+}
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+#nemo-header .nemo-logo {
+    color: inherit;
+
+    font-family:
+        "Mazius Display",
+        "Mazius Display Placeholder",
+        serif;
+
+    font-size: 28px;
+    line-height: 1;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition:
+        opacity .25s ease,
+        transform .35s var(--nemo-ease);
+}
+
+#nemo-header .nemo-logo:hover {
+    opacity: .72;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   DESKTOP NAV
+   ========================================================= */
+
+#nemo-header .nemo-desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+
+    margin-left: auto;
+}
+
+#nemo-header .nemo-desktop-link {
+    position: relative;
+
+    color: inherit;
+
+    font-family: "Cantarell", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition:
+        opacity .25s ease,
+        transform .3s var(--nemo-ease);
+}
+
+#nemo-header .nemo-desktop-link::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: -7px;
+
+    height: 1px;
+
+    background: currentColor;
+
+    transform: scaleX(0);
+    transform-origin: center;
+
+    transition: transform .35s var(--nemo-ease);
+}
+
+#nemo-header .nemo-desktop-link:hover {
+    opacity: .72;
+    transform: translateY(-1px);
+}
+
+#nemo-header .nemo-desktop-link:hover::after {
+    transform: scaleX(1);
+}
+
+/* =========================================================
+   LANGUAGE SWITCHER
+   ========================================================= */
+
+#nemo-language {
+    position: relative;
+
+    margin-left: 24px;
+}
+
+#nemo-language-button {
+    appearance: none;
+
+    min-width: 52px;
+    height: 34px;
+
+    padding: 0 11px;
+
+    border: 1px solid currentColor;
+    border-radius: 999px;
+
+    background: transparent;
+
+    color: inherit;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    cursor: pointer;
+
+    font-family: "Cantarell", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    transition:
+        background-color .3s ease,
+        color .3s ease,
+        border-color .3s ease,
+        transform .3s var(--nemo-ease);
+}
+
+#nemo-language-button:hover {
+    transform: translateY(-1px);
+}
+
+#nemo-language-chevron {
+    font-size: 9px;
+
+    transition:
+        transform .3s var(--nemo-ease);
+}
+
+#nemo-language.open #nemo-language-chevron {
+    transform: rotate(180deg);
+}
+
+/* language dropdown */
+
+#nemo-language-menu {
+    position: absolute;
+
+    right: 0;
+    top: calc(100% + 9px);
+
+    width: 125px;
+
+    padding: 7px;
+
+    border: 1px solid rgba(22, 63, 66, .10);
+    border-radius: 14px;
+
+    background: rgba(247, 241, 231, .98);
+
+    box-shadow:
+        0 14px 38px rgba(22, 63, 66, .15);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform:
+        translateY(-8px)
+        scale(.97);
+
+    transform-origin: top right;
+
+    transition:
+        opacity .25s ease,
+        transform .32s var(--nemo-ease),
+        visibility .25s ease;
+}
+
+#nemo-language.open #nemo-language-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+.nemo-language-option {
+    width: 100%;
+
+    appearance: none;
+    border: 0;
+
+    background: transparent;
+
+    color: var(--nemo-teal);
+
+    text-align: left;
+
+    padding: 10px 11px;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-family: "Cantarell", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: .8px;
+
+    transition:
+        background-color .2s ease,
+        transform .2s ease;
+}
+
+.nemo-language-option:hover {
+    background: rgba(232, 221, 200, .8);
+    transform: translateX(2px);
+}
+
+.nemo-language-option.active {
+    background: rgba(232, 221, 200, .65);
+}
+
+/* =========================================================
+   MOBILE HAMBURGER
+   ========================================================= */
+
+#nemo-mobile-menu-button {
+    display: none;
+
+    appearance: none;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+
+    border: 1px solid currentColor;
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: inherit;
+
+    cursor: pointer;
+
+    position: relative;
+
+    flex: 0 0 auto;
+
+    transition:
+        transform .3s var(--nemo-ease),
+        background-color .3s ease,
+        border-color .3s ease;
+}
+
+#nemo-mobile-menu-button:hover {
+    transform: scale(1.03);
+}
+
+#nemo-mobile-menu-button span,
+#nemo-mobile-menu-button::before,
+#nemo-mobile-menu-button::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+
+    width: 16px;
+    height: 1px;
+
+    background: currentColor;
+
+    transition:
+        transform .35s var(--nemo-ease),
+        opacity .25s ease;
+}
+
+#nemo-mobile-menu-button span {
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+#nemo-mobile-menu-button::before {
+    top: calc(50% - 5px);
+
+    transform:
+        translate(-50%, -50%);
+}
+
+#nemo-mobile-menu-button::after {
+    top: calc(50% + 5px);
+
+    transform:
+        translate(-50%, -50%);
+}
+
+/* open */
+
+body.nemo-menu-open #nemo-mobile-menu-button span {
+    opacity: 0;
+}
+
+body.nemo-menu-open #nemo-mobile-menu-button::before {
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(45deg);
+}
+
+body.nemo-menu-open #nemo-mobile-menu-button::after {
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(-45deg);
+}
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+#nemo-mobile-menu {
+    position: fixed;
+
+    z-index: 999998;
+
+    inset: 0;
+
+    padding:
+        110px
+        24px
+        30px;
+
+    background:
+        rgba(232, 221, 200, .97);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity .4s ease,
+        visibility .4s ease;
+}
+
+#nemo-mobile-menu.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.nemo-mobile-menu-inner {
+    width: min(600px, 100%);
+    height: 100%;
+
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.nemo-mobile-eyebrow {
+    color: var(--nemo-rust);
+
+    font-family: "Cantarell", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+
+    margin-bottom: 26px;
+
+    opacity: 0;
+
+    transform: translateY(12px);
+
+    transition:
+        opacity .4s ease .08s,
+        transform .5s var(--nemo-ease) .08s;
+}
+
+#nemo-mobile-menu.open .nemo-mobile-eyebrow {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nemo-mobile-link {
+    display: block;
+
+    color: var(--nemo-teal);
+
+    text-decoration: none;
+
+    font-family:
+        "Mazius Display",
+        "Mazius Display Placeholder",
+        serif;
+
+    font-size: clamp(44px, 11vw, 74px);
+
+    line-height: .98;
+
+    padding: 8px 0;
+
+    opacity: 0;
+
+    transform: translateY(25px);
+
+    transition:
+        opacity .5s ease,
+        transform .65s var(--nemo-ease),
+        color .25s ease;
+}
+
+.nemo-mobile-link:nth-of-type(1) {
+    transition-delay: .08s;
+}
+
+.nemo-mobile-link:nth-of-type(2) {
+    transition-delay: .14s;
+}
+
+.nemo-mobile-link:nth-of-type(3) {
+    transition-delay: .20s;
+}
+
+#nemo-mobile-menu.open .nemo-mobile-link {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nemo-mobile-link:hover {
+    color: var(--nemo-rust);
+}
+
+.nemo-mobile-footer {
+    margin-top: auto;
+
+    color: var(--nemo-teal);
+
+    font-family: "Cantarell", sans-serif;
+    font-size: 11px;
+    letter-spacing: .8px;
+
+    opacity: .65;
+}
+
+/* =========================================================
+   SECTION ANIMATION
+   ========================================================= */
+
+.nemo-reveal {
+    opacity: 0;
+
+    transform:
+        translateY(25px);
+
+    transition:
+        opacity .8s ease,
+        transform .9s var(--nemo-ease);
+}
+
+.nemo-reveal.nemo-visible {
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 809.98px) {
+
+    #nemo-header {
+        height: 66px;
+    }
+
+    body.nemo-scrolled #nemo-header {
+        height: 60px;
+    }
+
+    #nemo-header .nemo-header-inner {
+        width: calc(100% - 30px);
+
+        display: grid;
+
+        grid-template-columns: 42px 1fr 52px;
+
+        gap: 10px;
+    }
+
+    #nemo-mobile-menu-button {
+        display: block;
+    }
+
+    #nemo-header .nemo-logo {
+        justify-self: center;
+
+        font-size: 24px;
+    }
+
+    #nemo-header .nemo-desktop-nav {
+        display: none;
+    }
+
+    #nemo-language {
+        justify-self: end;
+
+        margin-left: 0;
+    }
+
+    #nemo-language-button {
+        min-width: 48px;
+        height: 32px;
+    }
+
+    #nemo-mobile-menu {
+        padding:
+            88px
+            22px
+            24px;
+    }
+
+    .nemo-mobile-link {
+        font-size: clamp(43px, 12vw, 64px);
+    }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    #nemo-header .nemo-logo {
+        font-size: 21px;
+    }
+
+    #nemo-mobile-menu {
+        padding:
+            82px
+            19px
+            20px;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+/* =========================================================
+   NEMO HERO PHOTO
+   ========================================================= */
+
+[data-framer-name="Courtyard Opening"] {
+    position: relative !important;
+
+    background-image:
+        linear-gradient(
+            180deg,
+            rgba(18, 42, 41, 0.50) 0%,
+            rgba(18, 42, 41, 0.65) 35%,
+            rgba(18, 42, 41, 0.85) 100%
+        ),
+        url("/images/hero.jpg") !important;
+
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+}
+@media (max-width: 809.98px) {
+
+    [data-framer-name="Courtyard Opening"] {
+        background-position: 58% center !important;
+    }
+
+}
+
+/* =========================================================
+   CYRILLIC DISPLAY FONT
+   ========================================================= */
+
+html[lang="ru"]
+[data-framer-component-type="Text"]
+h1,
+html[lang="ru"]
+[data-framer-component-type="Text"]
+h2 {
+    font-family:
+        "Cormorant Garamond",
+        "Mazius Display",
+        Georgia,
+        serif !important;
+}
+/* =========================================================
+   RUSSIAN DISPLAY FONT
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&display=swap');
+
+html[lang="ru"] [data-framer-component-type="Text"] h1,
+html[lang="ru"] [data-framer-component-type="Text"] h2 {
+    --framer-font-family: "Cormorant Garamond", Georgia, serif !important;
+    --font-family: "Cormorant Garamond", Georgia, serif !important;
+
+    font-family: "Cormorant Garamond", Georgia, serif !important;
+}
