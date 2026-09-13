@@ -46,12 +46,12 @@
                 "Забронировать",
 
             "39.7681° N, 64.4556° E — Old Bukhara":
-                "39.7681° N, 64.4556° E — Старая Бухара",
+                "39.780566° N, 64.4069443° E — Бухара",
 
             "A quiet courtyard, steps from the old city.":
                 "Тихий дворик в нескольких шагах от старого города.",
 
-            "A cozy family guest house in the heart of Bukhara — for slow mornings, cool shade, and a warm welcome.":
+            "Небольшой семейный гостевой дом в сердце Бухары — for slow mornings, cool shade, and a warm welcome.":
                 "Небольшой семейный гостевой дом в сердце Бухары — для спокойных утр, прохлады и тёплого приёма.",
 
             "Breakfast included":
@@ -191,12 +191,12 @@
                 "Bron qilish",
 
             "39.7681° N, 64.4556° E — Old Bukhara":
-                "39.7681° N, 64.4556° E — Eski Buxoro",
+                "39.780566° N, 64.4069443° E — Buxoro",
 
             "A quiet courtyard, steps from the old city.":
                 "Eski shahardan bir necha qadam naridagi sokin hovli.",
 
-            "A cozy family guest house in the heart of Bukhara — for slow mornings, cool shade, and a warm welcome.":
+            "Небольшой семейный гостевой дом в сердце Бухары — for slow mornings, cool shade, and a warm welcome.":
                 "Buxoro markazidagi kichik oilaviy mehmon uyi — sokin tonglar, salqin soya va iliq kutib olish uchun.",
 
             "Breakfast included":
@@ -323,7 +323,14 @@
                 "Eski Buxoro · O‘zbekiston"
         },
 
-        en: {}
+        en: {
+            "Небольшой семейный гостевой дом в сердце Бухары — for slow mornings, cool shade, and a warm welcome.":
+                "A cozy family guest house in the heart of Bukhara — for slow mornings, cool shade, and a warm welcome.",
+            
+            "39.7681° N, 64.4556° E — Old Bukhara":
+                "39.780566° N, 64.4069443° E — Bukhara"
+            
+        }
     };
 
 
@@ -335,6 +342,8 @@
 
     let currentLanguage =
         localStorage.getItem(STORAGE_KEY) || "ru";
+
+    let isApplyingLanguage = false;
 
 
     /* =====================================================
@@ -351,10 +360,6 @@
 
 
     function translatedText(original, language) {
-
-        if (language === "en") {
-            return original;
-        }
 
         return (
             translations[language]?.[original] ||
@@ -430,6 +435,8 @@
         collectOriginalText();
 
 
+        isApplyingLanguage = true;
+
         originalNodes.forEach(
             (original, node) => {
 
@@ -444,6 +451,10 @@
                     );
             }
         );
+
+        setTimeout(() => {
+            isApplyingLanguage = false;
+        }, 0);
 
 
         /* update header */
@@ -1166,6 +1177,32 @@
 
 
     /* =====================================================
+       WATCH FRAMER HYDRATION
+       ===================================================== */
+
+    function observeHydration() {
+
+        const root =
+            document.querySelector("#main");
+
+        if (!root) return;
+
+        const observer = new MutationObserver(() => {
+
+            if (isApplyingLanguage) return;
+
+            applyLanguage(currentLanguage);
+        });
+
+        observer.observe(root, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    }
+
+
+    /* =====================================================
        INITIALIZATION
        ===================================================== */
 
@@ -1220,6 +1257,8 @@
         applyLanguage(
             currentLanguage
         );
+
+        observeHydration();
     }
 
 
