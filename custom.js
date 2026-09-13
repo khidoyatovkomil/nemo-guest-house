@@ -5,6 +5,7 @@
 
 (() => {
     "use strict";
+    console.log("NEMO CUSTOM JS VERSION 3 LOADED");
 
     /* =====================================================
        CONFIG
@@ -175,7 +176,7 @@
                 "— Елена, Москва",
 
             "Old Bukhara · Uzbekistan":
-                "Старая Бухара · Узбекистан"
+                "Бухара · Узбекистан"
         },
 
 
@@ -320,16 +321,15 @@
                 "— Elena, Moskva",
 
             "Old Bukhara · Uzbekistan":
-                "Eski Buxoro · O‘zbekiston"
+                "Buxoro · O‘zbekiston"
         },
 
         en: {
             "Небольшой семейный гостевой дом в сердце Бухары — for slow mornings, cool shade, and a warm welcome.":
                 "A cozy family guest house in the heart of Bukhara — for slow mornings, cool shade, and a warm welcome.",
-            
+
             "39.7681° N, 64.4556° E — Old Bukhara":
-                "39.780566° N, 64.4069443° E — Bukhara"
-            
+                "39.780566° N, 64.4069443° E — Bukhara",
         }
     };
 
@@ -504,6 +504,26 @@
                     language
                 );
         });
+
+        /* update desktop nav */
+
+document
+    .querySelectorAll(
+        ".nemo-desktop-link"
+    )
+    .forEach(link => {
+
+        const key =
+            link.dataset.translationKey;
+
+        if (key) {
+            link.textContent =
+                translatedText(
+                    key,
+                    language
+                );
+        }
+    });
 
 
         /* remember */
@@ -1177,29 +1197,267 @@
 
 
     /* =====================================================
+   ROOM PHOTO GALLERIES + LIGHTBOX
+   ===================================================== */
+
+const roomGalleries = {
+    standard: [
+        "images/st-1.jpg",
+        "images/st-5.jpg",
+        "images/st-3.jpg",
+        "images/st-4.jpg",
+        "images/st-6.jpg",
+        "images/st-2.jpg",
+    ],
+    apartment: [
+        "images/ap-5.jpg",
+        "images/ap-2.jpg",
+        "images/ap-3.jpg",
+        "images/ap-1.jpg",
+        "images/ap-4.jpg",
+        "images/ap-6.jpg",
+    ],
+    family: [
+        "images/fa-4.jpg",
+        "images/fa-1.jpg",
+        "images/fa-3.jpg",
+        "images/fa-5.jpg",
+        "images/fa-6.jpg",
+        "images/fa-2.jpg",
+        "images/fa-7.jpg",
+    ]
+};
+
+const roomIndex = { standard: 0, apartment: 0, family: 0 };
+
+const roomSelectors = {
+    standard: ".framer-ftj993-container [data-framer-name='Room Image'] img",
+    apartment: '[data-framer-name="Apartment"] [data-framer-name="Room Image"] img',
+    family: '[data-framer-name="Family Apartment"] [data-framer-name="Room Image"] img'
+};
+
+const roomFallbackSelectors = {
+    standard: ".framer-ftj993-container img",
+    apartment: '[data-framer-name="Apartment"] img',
+    family: '[data-framer-name="Family Apartment"] img'
+};
+
+function getRoomImg(key) {
+    return document.querySelector(roomSelectors[key]) ||
+           document.querySelector(roomFallbackSelectors[key]);
+}
+
+let lightboxKey = null;
+let lightboxEl = null;
+
+/* ---- ставим нужную фотку ---- */
+
+function setRoomPhoto(key, index, updateLightbox) {
+    const photos = roomGalleries[key];
+    if (!photos || !photos.length) return;
+
+    const wrapped = ((index % photos.length) + photos.length) % photos.length;
+    roomIndex[key] = wrapped;
+
+    const img = getRoomImg(key);
+    if (img) {
+        // сбрасываем framer-овские srcset/sizes, ставим свой src
+        img.removeAttribute("srcset");
+        img.removeAttribute("sizes");
+        if (img.getAttribute("src") !== photos[wrapped]) {
+            img.setAttribute("src", photos[wrapped]);
+        }
+    }
+
+    if (updateLightbox && lightboxKey === key) {
+        renderLightbox();
+    }
+}
+
+/* ---- навешиваем стрелки/подсказку/клик ---- */
+
+function initRoomCarousels() {
+    Object.keys(roomSelectors).forEach(key => {
+        const img = getRoomImg(key);
+        if (!img) return;
+
+        const wrapper =
+            img.closest('[data-framer-name="Room Image"]') ||
+            img.parentElement;
+
+        wrapper.classList.add("nemo-room-photo");
+
+        // страхуемся от повторного добавления
+        if (!wrapper.dataset.nemoCarouselReady) {
+            wrapper.dataset.nemoCarouselReady = "1";
+
+            // подсказка при hover
+            if (!wrapper.querySelector(".nemo-room-hint")) {
+                const hint = document.createElement("div");
+                hint.className = "nemo-room-hint";
+                hint.innerHTML = `
+                    <span class="nemo-room-hint-icon">⤢</span>
+                    <span class="nemo-room-hint-text">View photos</span>
+                `;
+                wrapper.appendChild(hint);
+            }
+
+            // стрелки
+            const prev = document.createElement("button");
+            prev.type = "button";
+            prev.className = "nemo-room-arrow nemo-room-prev";
+            prev.setAttribute("aria-label", "Previous photo");
+            prev.innerHTML = "‹";
+
+            const next = document.createElement("button");
+            next.type = "button";
+            next.className = "nemo-room-arrow nemo-room-next";
+            next.setAttribute("aria-label", "Next photo");
+            next.innerHTML = "›";
+
+            wrapper.appendChild(prev);
+            wrapper.appendChild(next);
+
+            prev.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                setRoomPhoto(key, roomIndex[key] - 1, false);
+            });
+
+            next.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                setRoomPhoto(key, roomIndex[key] + 1, false);
+            });
+
+            // клик по фото (не по стрелке) — открыть лайтбокс
+            wrapper.addEventListener("click", event => {
+                if (event.target.closest(".nemo-room-arrow")) return;
+                openLightbox(key, roomIndex[key]);
+            });
+        }
+
+        // всегда синхронизируем актуальный src
+        setRoomPhoto(key, roomIndex[key], false);
+    });
+}
+
+/* ---- переприменение после ре-рендера Framer ---- */
+
+function reapplyRoomPhotos() {
+    Object.keys(roomGalleries).forEach(key => {
+        const img = getRoomImg(key);
+        if (!img) return;
+        const expected = roomGalleries[key][roomIndex[key]];
+        if (img.getAttribute("src") !== expected) {
+            img.removeAttribute("srcset");
+            img.removeAttribute("sizes");
+            img.setAttribute("src", expected);
+        }
+    });
+}
+
+/* ---- сам лайтбокс ---- */
+
+function createLightbox() {
+    if (lightboxEl) return;
+
+    lightboxEl = document.createElement("div");
+    lightboxEl.id = "nemo-lightbox";
+
+    lightboxEl.innerHTML = `
+        <button type="button" class="nemo-lightbox-close" aria-label="Close">×</button>
+        <button type="button" class="nemo-lightbox-arrow nemo-lightbox-prev" aria-label="Previous photo">‹</button>
+        <img class="nemo-lightbox-image" alt="">
+        <button type="button" class="nemo-lightbox-arrow nemo-lightbox-next" aria-label="Next photo">›</button>
+        <div class="nemo-lightbox-counter"></div>
+    `;
+
+    document.body.appendChild(lightboxEl);
+
+    lightboxEl.querySelector(".nemo-lightbox-close")
+        .addEventListener("click", closeLightbox);
+
+    lightboxEl.querySelector(".nemo-lightbox-prev")
+        .addEventListener("click", e => {
+            e.stopPropagation();
+            if (lightboxKey) setRoomPhoto(lightboxKey, roomIndex[lightboxKey] - 1, true);
+        });
+
+    lightboxEl.querySelector(".nemo-lightbox-next")
+        .addEventListener("click", e => {
+            e.stopPropagation();
+            if (lightboxKey) setRoomPhoto(lightboxKey, roomIndex[lightboxKey] + 1, true);
+        });
+
+    lightboxEl.addEventListener("click", event => {
+        if (event.target === lightboxEl) closeLightbox();
+    });
+
+    document.addEventListener("keydown", event => {
+        if (!lightboxEl.classList.contains("open")) return;
+        if (event.key === "Escape") closeLightbox();
+        if (event.key === "ArrowLeft"  && lightboxKey) setRoomPhoto(lightboxKey, roomIndex[lightboxKey] - 1, true);
+        if (event.key === "ArrowRight" && lightboxKey) setRoomPhoto(lightboxKey, roomIndex[lightboxKey] + 1, true);
+    });
+}
+
+function renderLightbox() {
+    if (!lightboxKey) return;
+    const photos = roomGalleries[lightboxKey];
+    const index  = roomIndex[lightboxKey];
+
+    lightboxEl.querySelector(".nemo-lightbox-image").src = photos[index];
+    lightboxEl.querySelector(".nemo-lightbox-counter").textContent =
+        (index + 1) + " / " + photos.length;
+}
+
+function openLightbox(key, index) {
+    createLightbox();
+    lightboxKey = key;
+    roomIndex[key] = index;
+    renderLightbox();
+    lightboxEl.classList.add("open");
+    document.body.classList.add("nemo-lightbox-open");
+}
+
+function closeLightbox() {
+    if (!lightboxEl) return;
+    lightboxEl.classList.remove("open");
+    document.body.classList.remove("nemo-lightbox-open");
+    lightboxKey = null;
+}
+
+
+    /* =====================================================
        WATCH FRAMER HYDRATION
        ===================================================== */
 
     function observeHydration() {
+    const root = document.querySelector("#main");
+    if (!root) return;
 
-        const root =
-            document.querySelector("#main");
+    let isModifying = false;
 
-        if (!root) return;
+    const observer = new MutationObserver(() => {
+        if (isApplyingLanguage || isModifying) return;
 
-        const observer = new MutationObserver(() => {
+        isModifying = true;
 
-            if (isApplyingLanguage) return;
+        applyLanguage(currentLanguage);
+        reapplyRoomPhotos();
+        initRoomCarousels();
 
-            applyLanguage(currentLanguage);
-        });
+        // снять флаг после того, как наши правки устаканятся
+        setTimeout(() => { isModifying = false; }, 50);
+    });
 
-        observer.observe(root, {
-            childList: true,
-            subtree: true,
-            characterData: true
-        });
-    }
+    observer.observe(root, {
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+}
 
 
     /* =====================================================
@@ -1243,6 +1501,8 @@
          */
 
         createHeader();
+
+        initRoomCarousels();
 
 
         fixAnchors();

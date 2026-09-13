@@ -1,4 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&display=swap');
+/* =========================================================
+   NYGHT SERIF — кириллический дисплейный шрифт
+   ========================================================= */
+
+
+@font-face {
+    font-family: 'Nyght Serif';
+    src:
+        url('/fonts/NyghtSerif-Regular.woff2') format('woff2'),
+        url('/fonts/NyghtSerif-Regular.otf')   format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* =========================================================
    NEMO GUEST HOUSE
    CUSTOM UI LAYER
@@ -712,31 +726,207 @@ body.nemo-menu-open #nemo-mobile-menu-button::after {
 }
 
 /* =========================================================
-   CYRILLIC DISPLAY FONT
+   RUSSIAN — NYGHT SERIF
+   Применяется ко всем текстовым элементам Framer,
+   когда язык страницы = ru
    ========================================================= */
 
-html[lang="ru"]
-[data-framer-component-type="Text"]
-h1,
-html[lang="ru"]
-[data-framer-component-type="Text"]
-h2 {
-    font-family:
-        "Cormorant Garamond",
-        "Mazius Display",
-        Georgia,
-        serif !important;
+html[lang="ru"] [data-framer-component-type="Text"],
+html[lang="ru"] [data-framer-component-type="Text"] *,
+html[lang="ru"] [data-framer-component-type="Text"] .framer-text,
+html[lang="ru"] .framer-text,
+html[lang="ru"] .nemo-mobile-link,
+html[lang="ru"] .nemo-mobile-eyebrow,
+html[lang="ru"] .nemo-mobile-footer,
+html[lang="ru"] .nemo-desktop-link,
+html[lang="ru"] .nemo-logo {
+    --framer-font-family: "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
+    --font-family:         "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
+
+    font-family: "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
+    letter-spacing: 0.02em !important;   /* ← воздух между буквами */
+    word-spacing:   0.10em !important;
 }
+
 /* =========================================================
-   RUSSIAN DISPLAY FONT
+   PHOTO OVERRIDES — forces our own images regardless of
+   whatever Framer tries to load at runtime
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&display=swap');
+/* --- Gallery "A place to linger" --- */
+[data-framer-name="Courtyard"] img {
+    content: url("/images/kuca5.jpg") !important;
+}
+[data-framer-name="Room"] img {
+    content: url("/images/kuca2.jpg") !important;
+}
+[data-framer-name="Tile Detail"] img {
+    content: url("/images/kuca1.jpg") !important;
+}
+[data-framer-name="Architecture"] img {
+    content: url("/images/kuca4.jpg") !important;
+}
+[data-framer-name="Bukhara Arches"] img {
+    content: url("/images/food1.jpg") !important;
+}
 
-html[lang="ru"] [data-framer-component-type="Text"] h1,
-html[lang="ru"] [data-framer-component-type="Text"] h2 {
-    --framer-font-family: "Cormorant Garamond", Georgia, serif !important;
-    --font-family: "Cormorant Garamond", Georgia, serif !important;
 
-    font-family: "Cormorant Garamond", Georgia, serif !important;
+
+/* --- Our Story --- */
+[data-framer-name="Courtyard Story Image"] img {
+    content: url("/images/kuca3.jpg") !important;
+}
+
+/* =========================================================
+   ROOM PHOTO CAROUSEL
+   ========================================================= */
+
+.nemo-room-photo {
+    position: relative !important;
+    cursor: pointer;
+}
+
+
+.nemo-room-hint {
+    position: absolute;
+    inset: 0;
+    background: rgba(18, 42, 41, .45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #f7f1e7;
+    opacity: 0;
+    transition: opacity .3s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.nemo-room-photo:hover .nemo-room-hint {
+    opacity: 1;
+}
+
+.nemo-room-hint-icon {
+    font-size: 22px;
+}
+
+.nemo-room-hint-text {
+    font-family: "Cantarell", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.nemo-room-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(18, 42, 41, .55);
+    color: #f7f1e7;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    transition: background .25s ease;
+}
+
+.nemo-room-arrow:hover {
+    background: rgba(18, 42, 41, .85);
+}
+
+.nemo-room-prev { left: 10px; }
+.nemo-room-next { right: 10px; }
+
+/* =========================================================
+   LIGHTBOX
+   ========================================================= */
+
+#nemo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(18, 42, 41, .96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility .3s ease;
+}
+
+#nemo-lightbox.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.nemo-lightbox-image {
+    max-width: 88vw;
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 3px;
+}
+
+.nemo-lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(247, 241, 231, .12);
+    color: #f7f1e7;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.nemo-lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(247, 241, 231, .12);
+    color: #f7f1e7;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+.nemo-lightbox-arrow:hover {
+    background: rgba(247, 241, 231, .22);
+}
+
+.nemo-lightbox-prev { left: 24px; }
+.nemo-lightbox-next { right: 24px; }
+
+.nemo-lightbox-counter {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #f7f1e7;
+    font-family: "Cantarell", sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+body.nemo-lightbox-open {
+    overflow: hidden;
+}
+
+@media (max-width: 809.98px) {
+    .nemo-lightbox-arrow { width: 44px; height: 44px; font-size: 22px; }
+    .nemo-lightbox-prev { left: 10px; }
+    .nemo-lightbox-next { right: 10px; }
 }
