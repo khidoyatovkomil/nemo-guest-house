@@ -12,6 +12,13 @@
     font-style: normal;
     font-display: swap;
 }
+@font-face {
+    font-family: 'Jonova';
+    src: url('/fonts/Jonova-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* =========================================================
    NEMO GUEST HOUSE
@@ -726,25 +733,49 @@ body.nemo-menu-open #nemo-mobile-menu-button::after {
 }
 
 /* =========================================================
-   RUSSIAN — NYGHT SERIF
-   Применяется ко всем текстовым элементам Framer,
-   когда язык страницы = ru
+   РУССКИЙ ЯЗЫК — РАЗДЕЛЬНЫЕ ШРИФТЫ
+   Заголовки — Nyght Serif, основной текст — Jonova
    ========================================================= */
 
-html[lang="ru"] [data-framer-component-type="Text"],
-html[lang="ru"] [data-framer-component-type="Text"] *,
-html[lang="ru"] [data-framer-component-type="Text"] .framer-text,
-html[lang="ru"] .framer-text,
+/* 1. ЗАГОЛОВКИ (H1, H2, крупные названия) — Nyght Serif */
+html[lang="ru"] .framer-text.framer-styles-preset-17pke13,
+html[lang="ru"] .framer-text.framer-styles-preset-lnwh38,
 html[lang="ru"] .nemo-mobile-link,
-html[lang="ru"] .nemo-mobile-eyebrow,
-html[lang="ru"] .nemo-mobile-footer,
-html[lang="ru"] .nemo-desktop-link,
-html[lang="ru"] .nemo-logo {
+html[lang="ru"] .nemo-logo,
+html[lang="ru"] [data-framer-component-type="Text"] h1,
+html[lang="ru"] [data-framer-component-type="Text"] h2 {
     --framer-font-family: "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
     --font-family:         "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
+    font-family:            "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
 
-    font-family: "Nyght Serif", "Cormorant Garamond", Georgia, serif !important;
-    letter-spacing: 0.02em !important;   /* ← воздух между буквами */
+    letter-spacing: 0.01em !important;
+    word-spacing:   0.14em !important;
+    line-height:    1.06 !important;
+}
+
+/* 2. ОСНОВНОЙ ТЕКСТ (описания, абзацы, подписи) — Jonova */
+html[lang="ru"] .framer-text.framer-styles-preset-1e2mqtn,
+html[lang="ru"] .framer-text.framer-styles-preset-1ej3wr5,
+html[lang="ru"] [data-framer-component-type="Text"] p,
+html[lang="ru"] [data-framer-component-type="Text"] span:not(.nemo-review-text) {
+    --framer-font-family: "Jonova", "Helvetica Neue", Arial, sans-serif !important;
+    --font-family:         "Jonova", "Helvetica Neue", Arial, sans-serif !important;
+    font-family:            "Jonova", "Helvetica Neue", Arial, sans-serif !important;
+
+    letter-spacing: 0.01em !important;
+    word-spacing:   0.06em !important;
+    line-height:    1.6 !important;
+}
+
+/* 3. НАВИГАЦИЯ — Jonova (как Cantarell в латинице) */
+html[lang="ru"] .nemo-desktop-link,
+html[lang="ru"] .nemo-mobile-eyebrow,
+html[lang="ru"] .nemo-mobile-footer {
+    --framer-font-family: "Jonova", "Helvetica Neue", Arial, sans-serif !important;
+    --font-family:         "Jonova", "Helvetica Neue", Arial, sans-serif !important;
+    font-family:            "Jonova", "Helvetica Neue", Arial, sans-serif !important;
+
+    letter-spacing: 0.06em !important;
     word-spacing:   0.10em !important;
 }
 
@@ -761,7 +792,7 @@ html[lang="ru"] .nemo-logo {
     content: url("/images/kuca2.jpg") !important;
 }
 [data-framer-name="Tile Detail"] img {
-    content: url("/images/kuca1.jpg") !important;
+    content: url("/images/kuca8.jpg") !important;
 }
 [data-framer-name="Architecture"] img {
     content: url("/images/kuca4.jpg") !important;
@@ -929,4 +960,261 @@ body.nemo-lightbox-open {
     .nemo-lightbox-arrow { width: 44px; height: 44px; font-size: 22px; }
     .nemo-lightbox-prev { left: 10px; }
     .nemo-lightbox-next { right: 10px; }
+}
+
+/* =========================================================
+   FOOTER — INSTAGRAM
+   ========================================================= */
+
+.nemo-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nemo-instagram {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: 1px solid rgba(247, 241, 231, 0.35);
+    border-radius: 50%;
+
+    color: var(--nemo-ivory);
+    text-decoration: none;
+
+    transition:
+        background-color .3s ease,
+        color .3s ease,
+        border-color .3s ease,
+        transform .35s var(--nemo-ease);
+}
+
+.nemo-instagram:hover {
+    background: var(--nemo-ivory);
+    color: var(--nemo-teal);
+    border-color: var(--nemo-ivory);
+    transform: translateY(-1px);
+}
+
+.nemo-instagram svg {
+    display: block;
+}
+
+/* =========================================================
+   GUEST NOTES — REVIEWS CAROUSEL
+   ========================================================= */
+
+/* Родительский контейнер Framer — делаем шире, чем 760px */
+.framer-43g82y[data-framer-name="Guest Quote"] {
+    width: min(920px, 100%) !important;
+    max-width: 100% !important;
+    padding: 20px 8px !important;
+}
+
+.nemo-reviews {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+}
+
+.nemo-reviews-viewport {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.nemo-reviews-track {
+    position: relative;
+    width: 100%;
+}
+
+/* Все слайды наложены друг на друга. Активный — position: relative,
+   поэтому именно он задаёт высоту контейнера. */
+.nemo-review {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0 8px;
+    text-align: center;
+    box-sizing: border-box;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity .4s ease, visibility .4s ease;
+}
+
+.nemo-review.active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.nemo-review-text {
+    font-family:
+        "Mazius Display",
+        "Mazius Display Placeholder",
+        serif;
+
+    /* Адаптивный размер: от 20px до 32px, зависит от ширины экрана */
+    font-size: clamp(20px, 2.4vw, 32px);
+    line-height: 1.2em;
+    letter-spacing: -0.01em;
+
+    color: var(--nemo-teal);
+    text-wrap: balance;
+    margin: 0;
+}
+
+.nemo-review-author {
+    font-family: "Cantarell", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+
+    color: var(--nemo-rust);
+    margin-top: 22px;
+}
+
+.nemo-reviews-controls {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.nemo-reviews-arrow {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 44px;
+    height: 44px;
+    padding: 0;
+
+    border: 1px solid var(--nemo-teal);
+    border-radius: 50%;
+
+    background: transparent;
+    color: var(--nemo-teal);
+
+    font-family: "Cantarell", sans-serif;
+    font-size: 20px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        background-color .3s ease,
+        color .3s ease,
+        transform .35s var(--nemo-ease),
+        border-color .3s ease;
+}
+
+.nemo-reviews-arrow:hover {
+    background: var(--nemo-teal);
+    color: var(--nemo-ivory);
+    transform: scale(1.06);
+}
+
+.nemo-reviews-arrow:active {
+    transform: scale(.98);
+}
+
+.nemo-reviews-counter {
+    font-family: "Cantarell", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+
+    color: var(--nemo-teal);
+
+    min-width: 48px;
+    text-align: center;
+}
+
+/* RU — Nyght Serif с более широкой разрядкой */
+html[lang="ru"] .nemo-review-text {
+    font-family:
+        "Nyght Serif",
+        "Cormorant Garamond",
+        Georgia,
+        serif !important;
+
+    letter-spacing: 0.02em !important;
+    word-spacing: 0.10em !important;
+}
+
+html[lang="ru"] .nemo-review-author {
+    letter-spacing: 2px !important;
+    word-spacing: 0.08em !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 809.98px) {
+
+    .nemo-review-text {
+        font-size: clamp(18px, 4.6vw, 24px);
+        line-height: 1.25em;
+    }
+
+    .nemo-reviews {
+        gap: 22px;
+    }
+
+    .nemo-reviews-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .nemo-reviews-controls {
+        gap: 16px;
+    }
+
+    html[lang="ru"] .nemo-review-text,
+    html[lang="ru"] .framer-text,
+    html[lang="ru"] [data-framer-component-type="Text"],
+    html[lang="ru"] [data-framer-component-type="Text"] *,
+    html[lang="ru"] .nemo-mobile-link,
+    html[lang="ru"] .nemo-mobile-eyebrow,
+    html[lang="ru"] .nemo-mobile-footer,
+    html[lang="ru"] .nemo-desktop-link,
+    html[lang="ru"] .nemo-logo {
+        letter-spacing: 0.03em !important;
+        word-spacing: 0.14em !important;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .nemo-review-text {
+        font-size: clamp(16px, 4.4vw, 20px);
+    }
+
+    .nemo-reviews-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+html[lang="ru"] .nemo-desktop-link {
+    letter-spacing: 2px !important;
 }

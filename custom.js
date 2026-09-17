@@ -532,6 +532,12 @@ document
             STORAGE_KEY,
             language
         );
+        document.dispatchEvent(
+            new CustomEvent(
+                "nemo:language-changed",
+                { detail: { language } }
+            )
+        );
     }
 
 
@@ -1429,17 +1435,99 @@ function closeLightbox() {
 }
 
 
+/* =====================================================
+   CUSTOM DOM OVERRIDES
+   Переприменяет наши правки после гидрации Framer:
+   WhatsApp / Telegram links + Instagram icon in footer
+   ===================================================== */
+
+function applyCustomDomOverrides() {
+
+    /* --- WhatsApp --- */
+    document
+        .querySelectorAll('[data-framer-name="WhatsApp Booking"]')
+        .forEach(el => {
+            const want = "https://wa.me/998907188585";
+            if (el.getAttribute("href") !== want) {
+                el.setAttribute("href", want);
+                el.setAttribute("target", "_blank");
+                el.setAttribute("rel", "noopener");
+            }
+        });
+
+    /* --- Telegram --- */
+    document
+        .querySelectorAll('[data-framer-name="Telegram Booking"]')
+        .forEach(el => {
+            const want = "https://t.me/nemo_guesthouse";
+            if (el.getAttribute("href") !== want) {
+                el.setAttribute("href", want);
+                el.setAttribute("target", "_blank");
+                el.setAttribute("rel", "noopener");
+            }
+        });
+
+    /* --- Instagram в футере --- */
+    const footer =
+        document.querySelector('[data-framer-name="Nemo Footer"]');
+
+    if (footer && !footer.querySelector(".nemo-instagram")) {
+
+        const title =
+            footer.querySelector(".framer-51n73u") ||
+            footer.firstElementChild;
+
+        if (title) {
+
+            /* оборачиваем название в бренд-обёртку, если её нет */
+            let brand = title.parentElement;
+
+            if (!brand.classList.contains("nemo-footer-brand")) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "nemo-footer-brand";
+
+                title.parentNode.insertBefore(wrapper, title);
+                wrapper.appendChild(title);
+
+                brand = wrapper;
+            }
+
+            /* добавляем иконку */
+            const ig = document.createElement("a");
+            ig.href = "https://www.instagram.com/nemo_guest_house";
+            ig.className = "nemo-instagram";
+            ig.target = "_blank";
+            ig.rel = "noopener";
+            ig.setAttribute("aria-label", "Instagram");
+            ig.innerHTML =
+                '<svg viewBox="0 0 24 24" fill="none" ' +
+                'stroke="currentColor" stroke-width="1.6" ' +
+                'stroke-linecap="round" stroke-linejoin="round" ' +
+                'width="16" height="16" aria-hidden="true">' +
+                '<rect x="3" y="3" width="18" height="18" rx="5" ry="5"/>' +
+                '<circle cx="12" cy="12" r="4"/>' +
+                '<circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"/>' +
+                '</svg>';
+
+            brand.appendChild(ig);
+        }
+    }
+}
+
+
     /* =====================================================
        WATCH FRAMER HYDRATION
        ===================================================== */
 
     function observeHydration() {
+
     const root = document.querySelector("#main");
     if (!root) return;
 
     let isModifying = false;
 
     const observer = new MutationObserver(() => {
+
         if (isApplyingLanguage || isModifying) return;
 
         isModifying = true;
@@ -1447,9 +1535,10 @@ function closeLightbox() {
         applyLanguage(currentLanguage);
         reapplyRoomPhotos();
         initRoomCarousels();
+        applyCustomDomOverrides();
+        initReviewsCarousel();
 
-        // снять флаг после того, как наши правки устаканятся
-        setTimeout(() => { isModifying = false; }, 50);
+        setTimeout(() => { isModifying = false; }, 60);
     });
 
     observer.observe(root, {
@@ -1504,6 +1593,10 @@ function closeLightbox() {
 
         initRoomCarousels();
 
+        applyCustomDomOverrides();
+
+        initReviewsCarousel();
+        initReviewsCarousel();
 
         fixAnchors();
 
@@ -1513,11 +1606,10 @@ function closeLightbox() {
 
         initRevealAnimations();
 
+        applyLanguage(currentLanguage);
 
-        applyLanguage(
-            currentLanguage
-        );
-
+        applyCustomDomOverrides();
+        initReviewsCarousel();
         observeHydration();
     }
 
@@ -1540,4 +1632,151 @@ function closeLightbox() {
         init();
     }
 
+
+    /* =====================================================
+   REVIEWS CAROUSEL
+   ===================================================== */
+
+const reviewsData = [
+    {
+        ru: {
+            text: "Nemo Guest House в Бухаре — это как попасть в гости к друзьям, у которых есть бассейн, мангал и отличный вкус. Двор-оазис с зеленью, шезлонгами и бассейном после пыльных прогулок по Бухаре — именно то, что нужно. Номер просторный, с кондиционером, чайником и нормальным душем. Завтрак подают во внутреннем дворике — сытный, местный, жена оценила лепёшки и свежий чай. Парковка бесплатная прямо у входа. Лайфхак: берите комнату с окнами во двор — на улицу выходит шумновато. Хозяин говорит по-русски, подскажет где поесть и что посмотреть.",
+            author: "— Евгений Тео"
+        },
+        uz: {
+            text: "Buxorodagi Nemo Guest House — hovuz, mangal va ajoyib didga ega do'stlaringiznikiga mehmonga borgandek. Buxoro bo'ylab sayr qilgandan keyin ko'katlar, shezlonglar va hovuz bilan oazis hovli — aynan kerak narsa. Xona keng, konditsioner, choynak va yaxshi dush bilan. Nonushta ichki hovlida beriladi — to'ydiradigan, mahalliy, xotinim non va yangi choyni qadrladi. Avtoturargoh bepul, kiraverishda. Layfxak: hovliga qaraydigan xonani oling — ko'chaga shovqinli. Xo'jayin rus tilida gapiradi, qayerda ovqatlanish va nima ko'rishni aytib beradi.",
+            author: "— Evgeniy Teo"
+        },
+        en: {
+            text: "Nemo Guest House in Bukhara is like visiting friends who have a pool, a grill, and great taste. A courtyard-oasis with greenery, sun loungers and a pool after dusty walks around Bukhara — exactly what you need. The room is spacious, with air conditioning, a kettle and a proper shower. Breakfast is served in the inner courtyard — hearty, local, my wife appreciated the flatbread and fresh tea. Free parking right at the entrance. Life hack: take a room with windows facing the courtyard — the street side is a bit noisy. The host speaks Russian, will tell you where to eat and what to see.",
+            author: "— Evgeny Teo"
+        }
+    },
+    {
+        ru: {
+            text: "Очень классный гостевой дом! Вежливые, гостеприимные и отзывчивые хозяева. Есть круглосуточный мини-бар с прохладительными напитками. Завтраки большие и вкусные, плов обалденный! Нодир всегда подсказывал где вкусно покушать, где и какие сувениры купить, какие достопримечательности посмотреть за городом. Рекомендуем!",
+            author: "— Владимир Елизаров"
+        },
+        uz: {
+            text: "Juda zo'r mehmon uyi! Muloyim, mehmondo'st va g'amxo'r xo'jayinlar. Kechayu kunduz salqin ichimliklar bilan mini-bar mavjud. Nonushtalar katta va mazali, palov ajoyib! Nodir har doim qayerda mazali ovqatlanish, qanday suvenirlar sotib olish, shahar tashqarisida qanday diqqatga sazovor joylarni ko'rishni aytib berardi. Tavsiya qilamiz!",
+            author: "— Vladimir Yelizarov"
+        },
+        en: {
+            text: "A very cool guest house! Polite, hospitable and responsive hosts. There's a 24-hour mini bar with refreshing drinks. Breakfasts are big and tasty, the pilaf is amazing! Nodir always suggested where to eat well, where and what souvenirs to buy, what sights to see outside the city. We recommend!",
+            author: "— Vladimir Elizarov"
+        }
+    },
+    {
+        ru: {
+            text: "Рекомендую гостевой дом к посещению. Очень гостеприимные и очень внимательные хозяева, вкусная еда, чистые номера и тишина улицы. И особенно отмечу — в 10 минутах все достопримечательности Бухары!",
+            author: "— Наталья Акименко"
+        },
+        uz: {
+            text: "Mehmon uyini tashrif buyurishni tavsiya qilaman. Juda mehmondo'st va g'amxo'r xo'jayinlar, mazali taom, toza xonalar va ko'cha tinchligi. Va ayniqsa ta'kidlayman — 10 daqiqada Buxoroning barcha diqqatga sazovor joylari!",
+            author: "— Natalya Akimenko"
+        },
+        en: {
+            text: "I recommend this guest house for a visit. Very hospitable and very attentive hosts, delicious food, clean rooms and quiet street. And I especially note — in 10 minutes, all the sights of Bukhara!",
+            author: "— Natalya Akimenko"
+        }
+    }
+];
+
+let reviewsIndex = 0;
+
+function initReviewsCarousel() {
+
+    const container = document.querySelector(
+    '.framer-43g82y[data-framer-name="Guest Quote"]'
+);
+
+if (!container) return;
+
+/* если наша карусель уже есть — ничего не делаем */
+if (container.querySelector(".nemo-reviews")) return;
+
+    // скрываем оригинальный одиночный отзыв
+    Array.from(container.children).forEach(child => {
+        if (!child.classList.contains("nemo-reviews")) {
+            child.style.display = "none";
+        }
+    });
+
+    const carousel = document.createElement("div");
+    carousel.className = "nemo-reviews";
+
+    carousel.innerHTML = `
+        <div class="nemo-reviews-viewport">
+            <div class="nemo-reviews-track"></div>
+        </div>
+        <div class="nemo-reviews-controls">
+            <button type="button" class="nemo-reviews-arrow nemo-reviews-prev" aria-label="Previous review">‹</button>
+            <span class="nemo-reviews-counter"></span>
+            <button type="button" class="nemo-reviews-arrow nemo-reviews-next" aria-label="Next review">›</button>
+        </div>
+    `;
+
+    container.appendChild(carousel);
+
+    const track    = carousel.querySelector(".nemo-reviews-track");
+    const counter  = carousel.querySelector(".nemo-reviews-counter");
+    const prevBtn  = carousel.querySelector(".nemo-reviews-prev");
+    const nextBtn  = carousel.querySelector(".nemo-reviews-next");
+
+    reviewsData.forEach(() => {
+        const slide = document.createElement("div");
+        slide.className = "nemo-review";
+        slide.innerHTML = `
+            <p class="nemo-review-text"></p>
+            <p class="nemo-review-author"></p>
+        `;
+        track.appendChild(slide);
+    });
+
+        function render() {
+        const lang =
+            document.documentElement.lang || "ru";
+
+        const slides =
+            track.querySelectorAll(".nemo-review");
+
+        slides.forEach((slide, i) => {
+            const data =
+                reviewsData[i][lang] ||
+                reviewsData[i].ru;
+
+            slide.querySelector(".nemo-review-text").textContent =
+                "“" + data.text + "”";
+
+            slide.querySelector(".nemo-review-author").textContent =
+                data.author;
+
+            /* Показываем только активный слайд — он задаёт высоту */
+            slide.classList.toggle(
+                "active",
+                i === reviewsIndex
+            );
+        });
+
+        counter.textContent =
+            (reviewsIndex + 1) + " / " + reviewsData.length;
+    }
+
+    function go(delta) {
+        reviewsIndex =
+            (reviewsIndex + delta + reviewsData.length) %
+            reviewsData.length;
+        render();
+    }
+
+    prevBtn.addEventListener("click", () => go(-1));
+    nextBtn.addEventListener("click", () => go(1));
+
+    document.addEventListener(
+        "nemo:language-changed",
+        render
+    );
+
+    render();
+}
 })();
