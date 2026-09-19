@@ -1520,31 +1520,37 @@ function applyCustomDomOverrides() {
        ===================================================== */
 
     function observeHydration() {
-
     const root = document.querySelector("#main");
     if (!root) return;
 
-    let isModifying = false;
+    let scheduled = false;
+
+    function runOnce() {
+        if (scheduled) return;
+        scheduled = true;
+
+        // даём браузеру «успокоиться» перед нашими правками
+        requestAnimationFrame(() => {
+            scheduled = false;
+
+            applyLanguage(currentLanguage);
+            reapplyRoomPhotos();
+            initRoomCarousels();
+            applyCustomDomOverrides();
+            initReviewsCarousel();
+        });
+    }
 
     const observer = new MutationObserver(() => {
-
-        if (isApplyingLanguage || isModifying) return;
-
-        isModifying = true;
-
-        applyLanguage(currentLanguage);
-        reapplyRoomPhotos();
-        initRoomCarousels();
-        applyCustomDomOverrides();
-        initReviewsCarousel();
-
-        setTimeout(() => { isModifying = false; }, 60);
+        // игнорируем мутации, которые вызваны нашими же правками
+        if (isApplyingLanguage) return;
+        runOnce();
     });
 
     observer.observe(root, {
         childList: true,
-        subtree: true,
-        characterData: true
+        subtree: true
+        // ⚠️ characterData убрано — именно оно вызывало лавину
     });
 }
 
